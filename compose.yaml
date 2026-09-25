@@ -1,0 +1,13 @@
+services:
+  autofactura:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kommerze-autofactura:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.docker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
