@@ -212,12 +212,12 @@ function SearchableSelect({ label, value, onChange, options, placeholder, loadin
   )
 }
 
-function Hero({ step }) {
+function Hero({ step, invoice }) {
   const copy = {
     1: ['Autofacturación', 'Genera tu factura de manera rápida y sencilla.'],
     2: ['Genera tu factura', 'Es rápido, fácil y seguro.'],
     3: ['Confirma y genera tu CFDI', 'Revisa la información y completa tu factura.'],
-    4: ['¡Tu factura ha sido generada!', 'Hemos enviado una copia a tu correo electrónico.'],
+    4: ['¡Tu factura ha sido generada!', invoice?.correoEnviado ? 'Hemos enviado una copia a tu correo electrónico.' : 'Tus archivos fiscales están listos para descargarse.'],
   }[step]
   return <div className="hero-copy"><span>AUTOFACTURACIÓN</span><h1>{copy[0]}</h1><p>{copy[1]}</p></div>
 }
@@ -495,14 +495,15 @@ function ReviewStep({ purchase, data, onBack, onEdit, onGenerate, generating, er
 }
 
 function SuccessStep({ purchase, data, invoice, onReset }) {
+  const downloadBase = `/api/autofacturacion/${encodeURIComponent(invoice.uuid)}/archivo`
   return (
     <div className="success-grid">
       <section className="success-card">
         <span className="success-icon"><Check /></span>
         <h2>¡Factura generada con éxito!</h2>
-        <p>Tu CFDI ha sido generado correctamente y se ha enviado a tu correo electrónico.</p>
-        <div className="download-row"><button className="button primary"><FileText /> Descargar PDF <Download /></button><button className="button outline"><FileText /> Descargar XML <Download /></button></div>
-        <div className="info-note email-note"><Mail /><p>También hemos enviado una copia de tu factura a:<br /><strong>{data.email}</strong></p></div>
+        <p>{invoice.correoEnviado ? 'Tu CFDI ha sido generado correctamente y se ha enviado a tu correo electrónico.' : 'Tu CFDI ha sido generado correctamente. Descarga y conserva tus archivos fiscales.'}</p>
+        <div className="download-row"><a className="button primary" href={`${downloadBase}/pdf`}><FileText /> Descargar PDF <Download /></a><a className="button outline" href={`${downloadBase}/xml`}><FileText /> Descargar XML <Download /></a></div>
+        <div className="info-note email-note"><Mail /><p>{invoice.correoEnviado ? <>También hemos enviado una copia de tu factura a:<br /><strong>{data.email}</strong></> : (invoice.advertenciaCorreo || 'No fue posible enviar el correo; tus archivos permanecen disponibles para descarga.')}</p></div>
         <button className="button outline reset" onClick={onReset}><RefreshCw /> Generar otra factura</button>
       </section>
       <aside className="summary-card final-summary"><h3>Resumen de tu factura</h3><dl><div><dt>Folio / Ticket de compra</dt><dd>{purchase.ticket}</dd></div><div><dt>Código de facturación</dt><dd>{purchase.code}</dd></div><div><dt>Fecha de compra</dt><dd>{purchase.date}</dd></div></dl><hr /><dl><div><dt>RFC</dt><dd>{data.rfc}</dd></div><div><dt>Nombre o razón social</dt><dd>{data.name}</dd></div><div><dt>Uso del CFDI</dt><dd>{data.cfdi}</dd></div></dl><hr /><dl><div><dt>Folio fiscal (UUID)</dt><dd>{invoice.uuid}</dd></div><div><dt>Serie y folio</dt><dd>{invoice.serie}{invoice.folio}</dd></div><div><dt>Fecha de timbrado</dt><dd>{formatDate(invoice.fechaTimbrado)}</dd></div><div><dt>Total</dt><dd><strong>{formatCurrency(invoice.total)}</strong></dd></div></dl><div className="info-note compact"><Info /><p>Tus archivos estarán disponibles por 30 días para que puedas descargarlos nuevamente.</p></div></aside>
@@ -591,7 +592,7 @@ function App() {
       })
 
       setInvoice(result)
-      notify(result.mensaje || 'Factura generada correctamente.', 'success')
+      notify(result.advertenciaCorreo || result.mensaje || 'Factura generada correctamente.', result.advertenciaCorreo ? 'error' : 'success')
       setStep(4)
     } catch (error) {
       const message = error.message || 'No fue posible generar la factura.'
@@ -615,7 +616,7 @@ function App() {
       {login ? <LoginView onBack={() => setLogin(false)} onLogin={() => setLogin(false)} /> : (
         <main className={`scene step-${step}`}>
           <div className="site-shell scene-content">
-            <Hero step={step} />
+            <Hero step={step} invoice={invoice} />
             <section className="flow-card">
               {step < 4 && <Stepper current={step} />}
               {content}

@@ -74,7 +74,7 @@ button { cursor: pointer; }
 .searchable-options button svg { width: 16px; height: 16px; color: rgb(var(--color-brand)); }
 .searchable-options button:hover, .searchable-options button.selected { color: rgb(var(--color-brand-dark)); background: rgb(var(--color-brand-light) / .72); }
 .searchable-options p { margin: 0; padding: 10px; color: rgb(var(--color-muted)); font-size: .8125rem; }
-.button { min-height: 40px; border: 0; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 32px; font-size: .875rem; line-height: 1.25rem; font-weight: 500; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
+.button { min-height: 40px; border: 0; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 0 32px; font-size: .875rem; line-height: 1.25rem; font-weight: 500; text-decoration: none; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
 .button:hover { transform: translateY(-1px); }
 .button:focus-visible, .text-button:focus-visible, a:focus-visible { outline: 2px solid rgb(var(--color-brand) / .2); outline-offset: 2px; }
 .button svg { width: 20px; }
