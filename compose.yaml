@@ -1,9 +1,10 @@
 services:
   autofactura:
+    container_name: autofactura-sayer-app
     build:
       context: .
       dockerfile: Dockerfile
-    image: kommerze-autofactura:latest
+    image: autofactura-sayer-img:latest
     restart: unless-stopped
     ports:
       - "3000:3000"
